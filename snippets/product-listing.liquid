@@ -1,0 +1,63 @@
+<div class="product-index-inner">
+  
+  {% if product.available %}
+    {% for col in product.collections %}
+    {% if col.handle == 'new' %}
+    <div class="new icn">{{ 'products.general.new' | t }}</div>
+    {% endif %}
+    {% endfor %}
+
+  {% unless product.type == 'Kilt Outfit Packages' %}
+      {% if product.price < product.compare_at_price %}
+    <div class="sale-item icn">{{ 'products.general.sale' | t }}</div>
+    {% endif %}
+  {% endunless %}
+
+    {% else %}
+    <div class="so icn">{{ 'products.general.sold' | t }}</div>
+    {% endif %}    
+
+  {% if product.images.size > 1 %}      
+  <a href="{{ product.url | within: collection }}" title="{{ product.title | escape }}">
+    <img class="img1" src="{{ product.featured_image | product_img_url: 'large' }}" alt="{{ product.title | escape }}" />
+    <img class="img2" src="{{ product.images[1] | product_img_url: 'large' }}" alt="{{ product.title | escape }}" /> 
+  </a>       
+  {% else %}       
+  <a href="{{ product.url | within: collection }}" title="{{ product.title | escape }}">
+    <img src="{{ product.featured_image | product_img_url: 'large' }}" alt="{{ product.title | escape }}" />
+  </a>  
+  {% endif %}
+
+  <!-- Hide quick view
+  <a class="fancybox.ajax product-modal button" href="{{ product.url }}?view=quick">{{ 'products.general.quick_view' | t }}</a>  
+  -->
+
+</div>  
+
+<div class="product-info"> 
+
+  <div class="product-info-inner">
+    <a href="{{ product.url | within: collection }}"> 
+     <h5>{{ product.vendor }}</h5>
+     <h3>{{ product.title }}</h3>
+    </a>        
+  {% if product.type == 'Kilt Outfit Packages' %}
+    <div class="price">
+      <div class="prod-price">{% if product.compare_at_price_varies %} {{ 'products.general.from' | t }} {{ product.compare_at_price_min | money }} - {{ product.compare_at_price_max | money }} {% else %}{{ product.compare_at_price | money }}{% endif %}</div>
+    </div>
+  {% else %}
+    <div class="price">
+      {% if product.price < product.compare_at_price %}
+      <div class="onsale">{{ product.price | money }}</div>
+      <div class="was">{{ product.compare_at_price | money }}</div>
+      {% else %}
+      <div class="prod-price">{% if product.price_varies %} {{ 'products.general.from' | t }} {{ product.price_min | money }} - {{ product.price_max | money }} {% else %}{{ product.price | money }}{% endif %}</div>
+      {% endif %}	
+    </div>
+  {% endif %}
+    <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+
+    
+  </div>
+
+</div>

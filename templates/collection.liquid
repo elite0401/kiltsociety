@@ -1,0 +1,40 @@
+<div id="collectionpage">
+  {% paginate collection.products by 48 %}
+  <div class="collection-description desktop-12">
+    <img src="{{ collection | img_url: 'master' }}" alt="{{ collection.title | escape }}" width="1175px" height="auto" />
+    <div class="flex-caption slide1">
+      <div class="vertical-container">
+    	<div class="vertical-cell">
+    		<div class="caption-inners">
+    			<h1>{{ collection.title }}</h1>
+      		</div>
+    	</div>
+      </div>
+    </div>
+    <div class="rte">{{ collection.description | remove: "[banner]" }}</div>
+  </div>
+
+  <div class="clear"></div>
+
+  {% if settings.collection-sidebar %}
+  	{% include 'collection-sidebar' %}
+  {% else %}
+    <div id="sorting-hat" class="desktop-12">
+      {% include 'sort' %}
+    </div>
+  {% endif %}
+
+  <div id="product-loop" class="{% if settings.collection-sidebar %}desktop-9 tablet-4{% else %}desktop-12 tablet-6{% endif %} mobile-3">
+    {% for product in collection.products %}
+      {% assign products-per-row = settings.products-per-row %}
+      <div class="product-index {% if products-per-row == "6" %}desktop-2{% cycle ' first', '', '', '', '', ' last' %}{% elsif products-per-row == "4" %}desktop-3{% cycle ' first', '', '', ' last' %}{% elsif products-per-row == "3" %}desktop-4{% cycle ' first', '', ' last' %}{% elsif products-per-row == "2" %}desktop-6{% cycle ' first', ' last' %}{% endif %} tablet-half mobile-half" id="prod-{{ product.id}}" data-alpha="{{ product.title }}" data-price="{{ product.price }}">
+        {% include 'product-listing' %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="clear"></div>
+  
+  {% include 'pagination' %}
+  {% endpaginate %}
+</div>

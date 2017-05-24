@@ -1,0 +1,812 @@
+{{ 'slick-theme.css' | asset_url | stylesheet_tag }}
+{{ 'slick.min.js' | asset_url | script_tag }}
+{{ 'jquery.cookie.js' | asset_url | script_tag }}
+{{ 'bootstrap.min.js' | asset_url | script_tag }}
+{{ 'bootstrap.min.css' | asset_url | stylesheet_tag }}
+{{ 'tartan_inc.css' | asset_url | stylesheet_tag }}
+{% include "tartan-add-to-cart" %}
+<script src="https://www.magnet.works/tartan/tartan_inc.js"></script>
+
+
+
+<!-- Start - Tartan Modal Popup -->
+<div class="modal fade" id="tartan_modal_popup" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal_loverlay" style="">
+        <img class="loading" alt="Loading..." src=" data:image/gif;base64,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" />
+      </div>
+      <div class="modal-header">
+        <div class="tartan-search">
+          <div class="sa_tsearch">
+            <div class="sa_btn_container">
+              <span id="sa_back_btn" title="Back" onclick="load_tartan_panel_previous(this);">
+                <img src=" data:image/png;base64,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" alt="<" />
+              </span>
+              <span id="sa_fwd_btn"  title="Forward" onclick="load_tartan_panel_next(this);">
+                <img src=" data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAVCAYAAAByrA+0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAKT2lDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjanVNnVFPpFj333vRCS4iAlEtvUhUIIFJCi4AUkSYqIQkQSoghodkVUcERRUUEG8igiAOOjoCMFVEsDIoK2AfkIaKOg6OIisr74Xuja9a89+bN/rXXPues852zzwfACAyWSDNRNYAMqUIeEeCDx8TG4eQuQIEKJHAAEAizZCFz/SMBAPh+PDwrIsAHvgABeNMLCADATZvAMByH/w/qQplcAYCEAcB0kThLCIAUAEB6jkKmAEBGAYCdmCZTAKAEAGDLY2LjAFAtAGAnf+bTAICd+Jl7AQBblCEVAaCRACATZYhEAGg7AKzPVopFAFgwABRmS8Q5ANgtADBJV2ZIALC3AMDOEAuyAAgMADBRiIUpAAR7AGDIIyN4AISZABRG8lc88SuuEOcqAAB4mbI8uSQ5RYFbCC1xB1dXLh4ozkkXKxQ2YQJhmkAuwnmZGTKBNA/g88wAAKCRFRHgg/P9eM4Ors7ONo62Dl8t6r8G/yJiYuP+5c+rcEAAAOF0ftH+LC+zGoA7BoBt/qIl7gRoXgugdfeLZrIPQLUAoOnaV/Nw+H48PEWhkLnZ2eXk5NhKxEJbYcpXff5nwl/AV/1s+X48/Pf14L7iJIEyXYFHBPjgwsz0TKUcz5IJhGLc5o9H/LcL//wd0yLESWK5WCoU41EScY5EmozzMqUiiUKSKcUl0v9k4t8s+wM+3zUAsGo+AXuRLahdYwP2SycQWHTA4vcAAPK7b8HUKAgDgGiD4c93/+8//UegJQCAZkmScQAAXkQkLlTKsz/HCAAARKCBKrBBG/TBGCzABhzBBdzBC/xgNoRCJMTCQhBCCmSAHHJgKayCQiiGzbAdKmAv1EAdNMBRaIaTcA4uwlW4Dj1wD/phCJ7BKLyBCQRByAgTYSHaiAFiilgjjggXmYX4IcFIBBKLJCDJiBRRIkuRNUgxUopUIFVIHfI9cgI5h1xGupE7yAAygvyGvEcxlIGyUT3UDLVDuag3GoRGogvQZHQxmo8WoJvQcrQaPYw2oefQq2gP2o8+Q8cwwOgYBzPEbDAuxsNCsTgsCZNjy7EirAyrxhqwVqwDu4n1Y8+xdwQSgUXACTYEd0IgYR5BSFhMWE7YSKggHCQ0EdoJNwkDhFHCJyKTqEu0JroR+cQYYjIxh1hILCPWEo8TLxB7iEPENyQSiUMyJ7mQAkmxpFTSEtJG0m5SI+ksqZs0SBojk8naZGuyBzmULCAryIXkneTD5DPkG+Qh8lsKnWJAcaT4U+IoUspqShnlEOU05QZlmDJBVaOaUt2ooVQRNY9aQq2htlKvUYeoEzR1mjnNgxZJS6WtopXTGmgXaPdpr+h0uhHdlR5Ol9BX0svpR+iX6AP0dwwNhhWDx4hnKBmbGAcYZxl3GK+YTKYZ04sZx1QwNzHrmOeZD5lvVVgqtip8FZHKCpVKlSaVGyovVKmqpqreqgtV81XLVI+pXlN9rkZVM1PjqQnUlqtVqp1Q61MbU2epO6iHqmeob1Q/pH5Z/YkGWcNMw09DpFGgsV/jvMYgC2MZs3gsIWsNq4Z1gTXEJrHN2Xx2KruY/R27iz2qqaE5QzNKM1ezUvOUZj8H45hx+Jx0TgnnKKeX836K3hTvKeIpG6Y0TLkxZVxrqpaXllirSKtRq0frvTau7aedpr1Fu1n7gQ5Bx0onXCdHZ4/OBZ3nU9lT3acKpxZNPTr1ri6qa6UbobtEd79up+6Ynr5egJ5Mb6feeb3n+hx9L/1U/W36p/VHDFgGswwkBtsMzhg8xTVxbzwdL8fb8VFDXcNAQ6VhlWGX4YSRudE8o9VGjUYPjGnGXOMk423GbcajJgYmISZLTepN7ppSTbmmKaY7TDtMx83MzaLN1pk1mz0x1zLnm+eb15vft2BaeFostqi2uGVJsuRaplnutrxuhVo5WaVYVVpds0atna0l1rutu6cRp7lOk06rntZnw7Dxtsm2qbcZsOXYBtuutm22fWFnYhdnt8Wuw+6TvZN9un2N/T0HDYfZDqsdWh1+c7RyFDpWOt6azpzuP33F9JbpL2dYzxDP2DPjthPLKcRpnVOb00dnF2e5c4PziIuJS4LLLpc+Lpsbxt3IveRKdPVxXeF60vWdm7Obwu2o26/uNu5p7ofcn8w0nymeWTNz0MPIQ+BR5dE/C5+VMGvfrH5PQ0+BZ7XnIy9jL5FXrdewt6V3qvdh7xc+9j5yn+M+4zw33jLeWV/MN8C3yLfLT8Nvnl+F30N/I/9k/3r/0QCngCUBZwOJgUGBWwL7+Hp8Ib+OPzrbZfay2e1BjKC5QRVBj4KtguXBrSFoyOyQrSH355jOkc5pDoVQfujW0Adh5mGLw34MJ4WHhVeGP45wiFga0TGXNXfR3ENz30T6RJZE3ptnMU85ry1KNSo+qi5qPNo3ujS6P8YuZlnM1VidWElsSxw5LiquNm5svt/87fOH4p3iC+N7F5gvyF1weaHOwvSFpxapLhIsOpZATIhOOJTwQRAqqBaMJfITdyWOCnnCHcJnIi/RNtGI2ENcKh5O8kgqTXqS7JG8NXkkxTOlLOW5hCepkLxMDUzdmzqeFpp2IG0yPTq9MYOSkZBxQqohTZO2Z+pn5mZ2y6xlhbL+xW6Lty8elQfJa7OQrAVZLQq2QqboVFoo1yoHsmdlV2a/zYnKOZarnivN7cyzytuQN5zvn//tEsIS4ZK2pYZLVy0dWOa9rGo5sjxxedsK4xUFK4ZWBqw8uIq2Km3VT6vtV5eufr0mek1rgV7ByoLBtQFr6wtVCuWFfevc1+1dT1gvWd+1YfqGnRs+FYmKrhTbF5cVf9go3HjlG4dvyr+Z3JS0qavEuWTPZtJm6ebeLZ5bDpaql+aXDm4N2dq0Dd9WtO319kXbL5fNKNu7g7ZDuaO/PLi8ZafJzs07P1SkVPRU+lQ27tLdtWHX+G7R7ht7vPY07NXbW7z3/T7JvttVAVVN1WbVZftJ+7P3P66Jqun4lvttXa1ObXHtxwPSA/0HIw6217nU1R3SPVRSj9Yr60cOxx++/p3vdy0NNg1VjZzG4iNwRHnk6fcJ3/ceDTradox7rOEH0x92HWcdL2pCmvKaRptTmvtbYlu6T8w+0dbq3nr8R9sfD5w0PFl5SvNUyWna6YLTk2fyz4ydlZ19fi753GDborZ752PO32oPb++6EHTh0kX/i+c7vDvOXPK4dPKy2+UTV7hXmq86X23qdOo8/pPTT8e7nLuarrlca7nuer21e2b36RueN87d9L158Rb/1tWeOT3dvfN6b/fF9/XfFt1+cif9zsu72Xcn7q28T7xf9EDtQdlD3YfVP1v+3Njv3H9qwHeg89HcR/cGhYPP/pH1jw9DBY+Zj8uGDYbrnjg+OTniP3L96fynQ89kzyaeF/6i/suuFxYvfvjV69fO0ZjRoZfyl5O/bXyl/erA6xmv28bCxh6+yXgzMV70VvvtwXfcdx3vo98PT+R8IH8o/2j5sfVT0Kf7kxmTk/8EA5jz/GMzLdsAAAAgY0hSTQAAeiUAAICDAAD5/wAAgOkAAHUwAADqYAAAOpgAABdvkl/FRgAAAFVJREFUeNrsy6EVQFAYgNFfUQ2hWsUEukXsYAjVEpIlTCFdwTtH9IIgvC/fL1BjRBU5YXE3Z03ocZbp99PgaXrDDbaED7QFf4/TsGbjNHTYs3BEXAMAATVcCMoVVRYAAAAASUVORK5CYII=" alt=">" />
+              </span>
+              <button type="button" class="exit" data-dismiss="modal" style=" float: right;"> X </button>
+            </div>
+            <label>Find Your Tartan</label>
+            <div class="sa_tartan_search_box">
+              <input type="text" placeholder="Type your surname or tartan" id="sa_search" maxlength="50" value="">
+              <button id="sa_search_btn" type="button" title="Search" class="button" pid='' onclick="load_tartan_search_data(this,null)">
+                <img alt="Search Tartans" title="Search Tartans" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAMAAAAolt3jAAAAZlBMVEV2dna6urp7e3t9fX3y8vK8vLySkpLBwcHx8fHf39+UlJTv7+9zc3OqqqqZmZn5+fmJiYnW1tbz8/P8+/xubm5vb2/09PSdnZ3d3d37+/u/v7/+/v79/fz6+vr5+vn9/f1sbGz////jm9VGAAAAeElEQVQI11WN2Q6DMBAD3QCF3keAHJBm9/9/sk5aVXQeLI1k2Xj9gZSSd03jfCoghCiVGAisH6duGLppPFhrse4lriTKkYkMmTOZBcyNnosuLC+EZSaUU33b9pxSVah+j2T3UfXOGGeqF62c7sV/qrerXDaq+fHUN9r6E41fzS4nAAAAAElFTkSuQmCC">
+              </button>
+            </div>
+          </div>
+          <img alt="" src="https://www.magnet.works/tartan/image/tartan_search_bg.jpg">
+        </div>
+      </div>
+      <div class="modal-body"></div>     
+    </div>
+  </div>
+</div>
+<!-- End - Tartan Modal Popup -->
+
+<div>
+  <div itemscope itemtype="http://schema.org/Product" id="product-{{ product.id }}" class="product-page">
+
+    <meta itemprop="url" content="{{ shop.url }}{{ product.url }}">
+    <meta itemprop="image" content="{{ product.featured_image.src | img_url: 'grande' }}">
+
+    <!--- For Mobile --->
+    <div id="mobile-product" class="mobile-3">
+      <div class="mobile-gallery">
+        <ul class="slides">    
+          {% for image in product.images %}
+          <li data-thumb="{{ image | product_img_url: 'small' }}" data-image-id="{{ image.id }}"><img data-image-id="{{ image.id }}" src="{{ image.src | product_img_url: 'grande' }}" alt="{{ image.alt | escape }}"></li>
+          {% endfor %}
+        </ul>
+      </div>  
+    </div>   
+
+    <!--- For Desktop --->
+
+
+    <div id="product-photos" class="desktop-6 mobile-3">
+      {% assign featured_image = product.selected_or_first_available_variant.featured_image | default: product.featured_image %}
+      <div class="main_bigimage desktop-12">
+        <img id="{{ product.id }}" src="{{ featured_image | img_url: '1024x1024' }}" data-image-id="{{ image.id }}" data-zoom-image="{{ featured_image | img_url: 'master' }}" alt='{{ image.alt }}' title="{{ product.title }}"/>
+      </div>
+      <div id="{{ product.id }}-gallery">	
+        {% for image in product.images %}
+        <a href="#" data-image="{{ image | product_img_url: '1024x1024' }}" data-image-id="{{ image.id }}" data-zoom-image="{{ image | product_img_url: 'master' }}">
+          <img class="thumbnail desktop-2" src="{{ image | product_img_url: 'compact' }}" data-image-id="{{ image.id }}" alt="{{ image.alt  | escape }}" />
+        </a>
+        {% endfor %} 
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      $(document).ready(function () {
+        
+        if (screen.width >= 768 )
+        {
+          //initiate the plugin and pass the id of the div containing gallery images
+          $("#{{ product.id }}").elevateZoom({
+            gallery:'{{ product.id }}-gallery',
+            cursor: 'pointer',
+            galleryActiveClass: 'active',
+            borderColour: '#eee',
+            borderSize: '1'
+            });
+        }
+        //pass the images to Fancybox
+        $("#{{ product.id }}").bind("click", function(e) {
+          var ez =   $('#{{ product.id }}').data('elevateZoom');
+          $.fancybox(ez.getGalleryList());
+        return false;
+      });	 
+
+      $('.mobile-gallery').flexslider({
+        animation: "fade",
+        controlNav: false,
+        slideshow: false,
+        directionNav: true,
+        controlNav: "thumbnails"
+      });      
+
+      }); 
+    </script>
+
+
+    <div id="product-description" class="desktop-6 mobile-3">
+
+      <h1 itemprop="name">{{ product.title }}</h1>  
+      <span class="product-sku">
+
+        <div id="sku">{{ product.variants.first.sku }}</div>
+
+      </span>
+
+      <div itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+        <p id="product-price">
+          {% if product.available %}
+          <span class="product-price product-final-price" itemprop="price">{{ product.price | money }}</span>
+          {% else %}
+          <span class="product-price" itemprop="price">Sold Out</span>
+          {% endif %}
+        </p>
+
+        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+
+        <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+        <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+        
+        <form action="/cart/add" method="post" data-money-format="{{ shop.money_format }}" id="product-form-{{ product.id }}" class="add-to-cart-form " main_form="true">
+          
+          <div id="variant-inventory">
+            {% if product.variants.first.inventory_management == "shopify" and product.variants.first.inventory_quantity > 0 %}
+            We currently have {{ product.variants.first.inventory_quantity }} in stock.
+            {% endif %}
+          </div>
+
+          <div class="select" style="display:none !important;">
+            <select id="product-select-{{ product.id }}" name="id">
+              {% for variant in product.variants %}
+              <option data-sku="{{ variant.sku }}" value="{{ variant.id }}">{{ variant.title }} - {{ variant.price | money }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <input type="hidden" name="quantity" value="1" />
+
+        </form>
+      </div>
+      
+        <div class="desc tartan_desc">
+
+          <h4>{{ 'products.product.product_details' | t }}</h4>
+
+          <div class="rte">{{ product.description | split: '<!-- split -->' | first }}</div>
+
+          {% if settings.show_tabs %}
+          <ul class="accordion">
+            {% unless settings.tab1 == blank %}
+            <li id="two" class="size">
+
+              {% if settings.tab1_title ==  blank %}
+              <a href="#two"><h4>{{ 'products.product.size_guide' | t }}</h4></a>
+              {% else %}
+              <a href="#two"><h4>{{ settings.tab1_title }}</h4></a>
+              {% endif %}           
+
+
+              <ul class="sub-menu">					
+                <li><div class="rte">{{ pages[settings.tab1].content }}</div></li>
+              </ul>
+            </li>
+            {% endunless %}
+
+
+            {% unless settings.tab2 == blank %}
+            <li id="three" class="delivery">
+
+              {% if settings.tab2_title ==  blank %}
+              <a href="#three"><h4>{{ 'products.product.delivery' | t }}</h4></a>
+              {% else %}
+              <a href="#three"><h4>{{ settings.tab2_title }}</h4></a>
+              {% endif %} 
+
+              <ul class="sub-menu">
+                <li><div class="rte">{{ pages[settings.tab2].content }}</div></li>
+              </ul>
+            </li>
+            {% endunless %}
+
+
+            {% unless settings.tab3 == blank %}
+            <li id="four" class="returns">
+
+              {% if settings.tab3_title ==  blank %}
+              <a href="#four"><h4>{{ 'products.product.returns' | t }}</h4></a>
+              {% else %}
+              <a href="#four"><h4>{{ settings.tab3_title }}</h4></a>
+              {% endif %}           
+
+              <ul class="sub-menu">					
+                <li><div class="rte">{{ pages[settings.tab3].content }}</div></li>
+              </ul>
+            </li>
+            {% endunless %}	
+          </ul>
+
+
+          <script type="text/javascript">
+            $(document).ready(function() {
+              // Store variables			
+              var accordion_head = $('.accordion > li > a'),
+                  accordion_body = $('.accordion li > .sub-menu');
+              // Click function
+              accordion_head.on('click', function(event) {
+                // Disable header links				
+                event.preventDefault();
+                // Show and hide the tabs on click
+                if ($(this).attr('class') != 'active'){
+                  accordion_body.slideUp('normal');
+                  $(this).next().stop(true,true).slideToggle('normal');
+                  accordion_head.removeClass('active');
+                  $(this).addClass('active');
+                } else {
+                  accordion_body.slideUp('normal');
+                  accordion_head.removeClass('active');
+                }
+              });
+            });
+          </script>
+
+          {% endif %}
+
+          {% if product.description contains '<!-- split -->' %}
+          <div id="split-description" class="desktop-12 tablet-6 mobile-3">
+            <h4 class="section-title">{{ 'products.product.product_more_details' | t }}</h4>
+            <div class="rte">{{ product.description | split: '<!-- split -->' | last }}</div>
+          </div>
+          {% endif %}
+
+
+        </div>
+        <div id="productnav" class="desktop-12 mobile-3">
+          <h4>{{ 'products.product.view_more' | t }}</h4>
+          <ul class="view-more">
+            <li>{{ 'products.product.product_type' | t }} {{ product.type | link_to_type }}</li>
+            <li>{{ 'products.product.brand' | t }}: {{ product.vendor | link_to_vendor }}</li>
+            {% if collection %}
+            <li>{{ 'products.product.collection' | t }} {% capture url %}/collections/{{ collection.handle }}{% endcapture %}{{ collection.title | link_to: url }}</li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <div class="select_option">
+          <input type="button" name="button" class="select_btn" value="Select options" id="sa_select_opt"/>
+        </div>
+
+        {% if settings[oft_video_url] != "" %}
+        <div class="youtube_video">
+          <iframe width="100%" height="100%" frameborder="0" allowfullscreen="" src="{{settings[oft_video_url]}}"></iframe>
+        </div>
+        {% endif %}
+
+        
+        <script>
+
+          // Shopify Product form requirement
+          var selectCallback_{{product.id}} = function(variant, selector) {
+            
+            if (variant) {
+              if (variant.inventory_management == "shopify" && variant.inventory_policy != "continue") {
+                if (variant.inventory_quantity > 0) {
+                  jQuery('#variant-inventory').text('We have ' + variant.inventory_quantity + ' in stock.');
+                } else {
+                  jQuery('#variant-inventory').text("This product is sold out");
+                }
+              } else {
+                jQuery('#variant-inventory').text("{{product.metafields.shipping.leadtime}}");
+              }
+            } else {
+              jQuery('#variant-inventory').text("");
+            }
+            
+            var $product = $('#product-' + selector.product.id);    
+
+
+            if (variant && variant.available == true) {
+              $('.product-price', $product).html(Shopify.formatMoney(variant.price, $('form', $product).data('money-format'))) 
+              $('.add', $product).removeClass('disabled').removeAttr('disabled').val("{{ 'products.product.add_to_cart' | t }}");
+                                                                                     } else {
+                                                                                     var message = variant ? "{{ 'products.product.sold_out' | t }}" : "{{ 'products.product.sold_out' | t }}";
+                                                                                     $('.product-price', $product).text(message);
+              $('.add', $product).addClass('disabled').attr('disabled', 'disabled').val(message); 
+              count_final_price();
+            } 
+
+            if (variant && variant.featured_image) {
+              var original_image = $("#{{ product.id }}"), new_image = variant.featured_image;
+
+                                     {% if template == 'product' %}
+                                     var $slider = $('.mobile-gallery');
+              var original_image = $(".flex-active-slide img"), new_image = variant.featured_image;                             
+              {% endif %}
+              Shopify.Image.switchImage(new_image, original_image[0], function (new_image_src, original_image, element) {
+
+                $(element).parents('a').attr('href', new_image_src);
+                $(element).attr('src', new_image_src);   
+                $(element).attr('data-image', new_image_src);   
+                $(element).attr('data-zoom-image',new_image_src);
+
+                $('.thumbnail[data-image-id="' + variant.featured_image.id + '"]').trigger('click');
+
+                {% if template == 'product' %}
+                $slider.each(function() { $(this).flexslider($('[data-image-id="' + variant.featured_image.id + '"]').data('index')); });
+                {% endif %}
+
+              });
+
+            }
+
+          }; 
+
+          {% if product.variants.size > 1 or product.options.size > 1 %}
+
+          $(function() {
+            $product = $('#product-' + {{ product.id }});
+                         new Shopify.OptionSelectors("product-select-{{ product.id }}", { product: {{ product | json }}, onVariantSelected:
+                         selectCallback_{{product.id}}, enableHistoryState: false });
+
+
+          });    
+
+          {% endif %}
+        </script>
+
+      
+
+    </div>
+
+    <div class="clear"></div>
+
+    {% if product.description contains '<!-- split -->' %}
+    <div id="split-description" class="desktop-12 tablet-6 mobile-3">
+      <h4 class="section-title">{{ 'products.product.product_more_details' | t }}</h4>
+      <div class="rte">{{ product.description | split: '<!-- split -->' | last }}</div>
+    </div>
+    {% endif %}
+
+  </div>
+  <div class="oft_loader_container" style="text-align:center;">
+    <img src="{{ 'outfit_loading.gif' | asset_url }}" alt="Loading Outfits..."/>
+  </div>
+
+  <div class="outfit_container" style="display:none;">
+	
+    {% assign tcount = 0 %}
+    {% for i in (1..20) %}
+    {% capture oft_colls %}oft{{ outfit_no }}_list_collection{{ i }}{% endcapture %}
+    {% if settings[oft_colls] != "" %}
+    {% if collections[settings[oft_colls]].products.count > 0 %}    
+    
+    {% capture oft_colls_require %}oft{{ outfit_no }}_product_required{{ i }}{% endcapture %}
+
+    <div class="outfit_div">
+      <div class="outfit_slider">
+
+        {% capture oft_colls_title_field %}oft{{ outfit_no }}_list_collection{{ i }}_name{% endcapture %}
+        {% assign oft_coll_title =  collections[settings[oft_colls]].title %}
+        {% unless settings[oft_colls_title_field] == "" %}
+        {% assign oft_coll_title = settings[oft_colls_title_field] %}
+        {% endunless %}
+
+        {% unless settings[oft_colls_require] %}
+        <div> 
+          <div class="main_of oft_coll_slide">
+            {% assign coll_image = "coll_no_image.jpeg" | asset_url %}
+            {% if collections[settings[oft_colls]].image %}
+            {% assign coll_image = collections[settings[oft_colls]].image | img_url: 'grande' %}
+            {% endif %}
+
+            <div class="img_div">
+              <a title="{{oft_coll_title}}" href="{{ collections[settings[oft_colls]].url }}" >
+                <img class="outfit_img oft_coll_no_img" src="{{ coll_image }}" />
+              </a>
+              <span class="info_text">Swipe to add {{ oft_coll_title }}</span>
+            </div>
+          </div>
+        </div>
+        {% endunless %}
+
+        {% assign oft_coll_id = collections[settings[oft_colls]].id %}
+		{% assign count = 0 %}
+        
+        {% for oft_product in collections[settings[oft_colls]].products %}
+        {% if oft_product.available %}
+        {% assign count = count | plus:1 %}
+        <div> 
+          <div class="main_of">
+
+            <div class="img_div">
+              <a id="oft_featured_img_{{ oft_product.id }}" title="{{oft_product.title}}" href="{{ oft_product.url }}?view=quick"  class="fancybox.ajax of_info_1">
+                <img class="outfit_img" src="{{ oft_product.featured_image.src | img_url: '560x' }}" />
+              </a>
+            </div>
+
+            <div class="content_div">
+              <div class="outfit_desc">
+                {% assign hide_default_title = false %}
+                {% if oft_product.variants.size == 1 and oft_product.variants.first.title contains 'Default' %}
+                {% assign hide_default_title = true %}
+                {% endif %}
+
+                <h3 class="title">{{ oft_coll_title }}</h3>
+                <span class="detail">
+                  {{oft_product.title}}
+                  <a title="{{oft_product.title}}" href="{{ oft_product.url }}?view=quick"  class="fancybox.ajax of_info oft_featured_img_{{ oft_product.id }}">i</a>
+                </span>
+
+                {% if hide_default_title == true %}
+                <span class="price oftprice-{{ oft_product.id }} in_count_price">{{ oft_product.price | money }}</span>
+                {% else %}
+                <span class="price oftprice-{{ oft_product.id }} in_count_price multi_opt_price">{{ oft_product.price | money }}</span>
+                {% endif %}
+
+                {% comment %}
+                {% assign is_kilt = false %}
+                {% if oft_coll_title == "Kilts" or oft_coll_title == "Kilt" or oft_coll_title == "Trews" %}
+                {% assign is_kilt = true %}
+                {% endif %}
+                {% endcomment %}
+                
+                {% if oft_product.options contains "Price Id"%}
+                {% if count == 1 %}
+                {% assign tcount = tcount | plus:1 %}
+                {% endif %}
+                <!-- Start - Tartan detail as properties -->
+                <input type="hidden" value="" id="tartan_id_{{ oft_product.id }}" name="tartan_id"/>
+                <input type="hidden" value="" id="tartan_name_{{ oft_product.id }}" name="properties[Tartan Name]"/>
+                <input type="hidden" value="" id="tartan_mill_{{ oft_product.id }}" name="properties[Tartan Mill]"/>
+                <input type="hidden" value="" id="tartan_weight_{{ oft_product.id }}" name="properties[Tartan Weight]"/>
+                <!-- End - Tartan detail as properties -->
+                <div class="tartan_inc" pro_id="{{ oft_product.id }}" tindex="{{ tcount }}">
+                  <div class="product_tartan">
+                    <img src="{{"ring.gif" | asset_url}}" style="width: 70px;"/>
+                  </div>
+                </div>                
+                {% endif %}
+                
+                
+
+                <form {% if hide_default_title == true %}variant_avail="{{hide_default_title}}"{%endif%} coll_name="{{ oft_coll_title }}" variant_selected="false" required="true" action="/cart/add" method="post" data-money-format="{{ shop.money_format }}" id="oftproduct-form-{{ oft_product.id }}" class="add-to-cart-form {% if oft_product.options contains "Price Id"%}contain_tartan{%endif%}" pid="{{oft_product.id}}">
+                  {% if oft_product.options.size == 1 and oft_product.variants.size == 1 %}
+                  {% assign hide_default_title = true %}   
+                  {% endif %}
+                  {% include 'product-customizer' %}
+                  <div class="select clearfix"{% if hide_default_title %} style="display:none"{% endif %}>
+                    <select id="oftproduct-select-{{oft_product.id}}" name="id">
+                      {% for variant in oft_product.variants %}
+                      {% if variant.available %}
+                      <option value="{{ variant.id }}"{% if variant == oft_product.selected_or_first_available_variant %} selected="selected" {% endif %}>{{ variant.title }} - {{ variant.price | money }}</option>
+                      {% endif %}
+                      {% endfor %}
+                    </select>
+                  </div>
+					
+                  <input type="hidden" name="quantity" value="1" />
+                  <input type="hidden" value="{{ product.id }}" name="properties[group_id]"/>
+                </form>
+
+                <span class="info_text">SWIPE TO CHANGE OPTION</span>
+                
+                <script>
+                  var selectCallback_{{oft_product.id}} = function(variant, selector) {
+                    if (variant && variant.featured_image) {
+                      var newImage = variant.featured_image;
+                      var element  = jQuery('#oft_featured_img_{{oft_product.id}} img')[0]; // DOM element of main image we need to swap.;
+                                            Shopify.Image.switchImage(newImage, element, function (newImageSizedSrc, newImage, element) {
+                        //$(element).parents('a').attr('href', newImageSizedSrc);
+                        $(element).attr('src', newImageSizedSrc);
+                        //$(".oft_featured_img_{{ oft_product.id }}").attr("href",newImageSizedSrc);
+
+                      });
+                    }
+
+                    if (variant && variant.available) {
+                      $("#oftproduct-form-{{ oft_product.id }}").attr("variant_selected","true");
+                        $(".of_select_msg-{{ oft_product.id }}").hide();
+                        $(".oftprice-{{ oft_product.id }}").html(Shopify.formatMoney(variant.price, "{{ shop.money_format }}")).show();
+                        } else {
+                        $("#oftproduct-form-{{ oft_product.id }}").attr("variant_selected","false");
+                        
+                        var opt_flag = true;
+                        $('.outfit_dropdown[p_id="{{ oft_product.id }}"]').each(function(){
+                          if($(this).find("option:selected").val() == ""){
+                            opt_flag = false;
+                          }
+                        });
+                    	if(opt_flag == true){
+                        	$(".oftprice-{{ oft_product.id }}").html('Unavailable');
+                              }else{
+                              	$(".oftprice-{{ oft_product.id }}").html(Shopify.formatMoney("{{ oft_product.price }}", "{{ shop.money_format }}")).show();
+                              }
+                        }
+                        };
+
+                        jQuery(document).ready(function($){
+                        if($("#oftproduct-select-{{oft_product.id}}").length){
+                        
+                        new Shopify.OptionSelectors('oftproduct-select-{{oft_product.id}}', {
+                                                    product: {{ oft_product | json }},
+                                                    onVariantSelected: selectCallback_{{oft_product.id}},
+                                                    enableHistoryState: false
+                                                    });                           
+                      }
+                        // Hide selectors if we only have 1 variant and its title contains 'Default'.
+                        {% if oft_product.variants.size == 1 and oft_product.variants.first.title contains 'Default' %}
+                        $('#oftproduct-form-{{oft_product.id}} .selector-wrapper').hide();
+                          {% endif %}
+
+                           {% unless oft_product.variants.size == 1 and oft_product.variants.first.title contains 'Default' %}
+                          {% for option in oft_product.options %}
+                          $('label[for="oftproduct-select-{{oft_product.id}}-option-{{ forloop.index0 }}"]').hide();
+                          $('#oftproduct-select-{{oft_product.id}}-option-{{ forloop.index0 }}')
+                          .filter(function() { 
+                          return $(this).find('option').size() > 1 
+                        })
+                        .prepend('<option value="" selected>Select ' + {{ oft_product.options[forloop.index0] | json }} + '</option>');
+
+                        //.trigger('change');
+						
+                        $('#oftproduct-select-{{oft_product.id}}-option-{{ forloop.index0 }}').addClass("outfit_dropdown").attr("p_id","{{ oft_product.id }}");
+                          if($.trim({{ oft_product.options[forloop.index0] | json }}).toLowerCase() == "price id" && $("#oftproduct-form-{{ oft_product.id }}").hasClass("contain_tartan")){
+                          $('#oftproduct-select-{{oft_product.id}}-option-{{ forloop.index0 }}').attr("price_tartan","true").hide();
+                            }
+
+                            {% endfor %}
+{% endunless %}
+                            Shopify.linkOptionSelectors({{ oft_product | json }});
+                        });
+                </script>
+
+              </div>
+            </div>
+          </div>
+        </div> 
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+<div class="fix_price_cart">
+      <div class="price_div">
+        <span>current price</span>
+        <div class="current_price">
+          <span class="product-final-price" itemprop="price">{{ 0.00 | money }}</span>
+        </div>
+      </div>
+
+      {% if product.available %}  
+      <input type="button" name="button" is_tartan="true" oft_no="{{ outfit_no }}" oft_name="{{ outfit_name }}" class="tartan_addto_cart add clearfix oft_add_opacity" value="{{ 'products.product.add_to_cart' | t }}" />
+      {% else %}
+      <span>SOLD OUT</span>
+      {% endif %}
+
+    </div>
+
+<div id="shopify-product-reviews" data-id="{{product.id}}">{{ product.metafields.spr.reviews }}</div>
+
+{% if settings.show_related_products %}
+{% include 'related-products' %}
+{% endif %}
+<style>
+  .fancybox-inner{height:auto !important;overflow:visible !important;}
+</style>
+<script>
+
+  $(document).ready(function(){
+
+    $('.outfit_slider').slick({
+      adaptiveHeight: false
+    });
+
+    if($(".tartan_inc").length){
+      $(".slick-active .tartan_inc").each(function(){
+        var tindex = $(this).attr("tindex");
+      	var pro_id = $(this).attr("pro_id");
+      	tartan_div_insilder(pro_id,tindex,"true");
+      });
+    }
+
+    $(".oft_loader_container").remove();
+    $(".outfit_container").show();
+
+    count_final_price();
+
+    //stickyDiv();
+    
+    /*$(".outfit_slider .slick-slide").each(function(){
+      if($(this).find(".info_text").length){
+        var next_pro_title = $(this).next().find(".detail > .of_info").attr("title");
+        $(this).find(".info_pro_title").text(next_pro_title);
+      }
+    });*/
+
+    $(document).scroll(function () {
+      stickyDiv();
+    });
+    
+    /*$(window).on('scroll', function() {
+    	stickyDiv();
+    });
+    
+    $('window').on('touchmove', function(event) {
+    	stickyDiv();
+    });
+*/
+
+    // On swipe event
+    $('.outfit_slider').on('afterChange', function(event, slick, currentSlide){
+      if($(this).find(".slick-active .tartan_inc").length){
+        var tindex = $(this).find(".slick-active .tartan_inc").attr("tindex");
+        var pro_id = $(this).find(".slick-active .tartan_inc").attr("pro_id");
+        $(".tartan_inc[pro_id='"+pro_id+"'] .product_tartan").html('<img src="{{'ring.gif' | asset_url}}" style="width: 70px;"/>')
+                                                                   tartan_div_insilder(pro_id,tindex,"false");
+      }
+      
+      /*var next_pro_title = $(this).find(".slick-active").next().find(".detail > .of_info").attr("title");
+      $(this).find(".slick-active .info_pro_title").text(next_pro_title);*/
+      count_final_price();
+    });
+
+    $(document).on("change",".single-option-selector",function(){
+      count_final_price();
+    });
+
+    $(".of_info,.of_info_1").fancybox({
+      openEffect	: 'none',
+      closeEffect	: 'none',
+      /*prevEffect		: 'none',
+      nextEffect		: 'none',*/
+      helpers : {
+        /*title : {
+          type : 'inside'
+        },*/
+        overlay: {
+          locked: false
+        }
+      },
+      afterLoad : function() {
+        //this.title = 'Image ' + (this.index) + ' of ' + this.group.length + (this.title ? ' - ' + this.title : '');
+        //this.title = 'Image ' + (this.index) + ' of ' + this.group.length;
+        var content = $("<div>").html(this.content);
+        $(content).find(".product-add").remove();
+        $(content).find(".select").remove();
+        this.content = $(content).html();
+      }
+    });
+
+    $(document).on("click","#sa_select_opt",function(){
+      if($('.outfit_container:visible')){
+        $('html,body').animate({
+          scrollTop: $('.outfit_container').offset().top
+        }, 1000);
+      }else{
+        $('html,body').animate({
+          scrollTop: $('.outfit_container').offset().top
+        }, 1000);
+      }
+    });
+    
+  });  
+
+  document.addEventListener('scroll', function() {
+      stickyDiv();
+  });
+  
+
+  /*function stickyDiv() {
+    var div = $('.fix_price_cart');
+    var winHeight = $(window).height();
+    var ftrOffsetTop = $('.outfit_div').eq(1).offset().top+$('.outfit_div').eq(1).height()+70;//$('#footer').offset().top;
+    var scrollTop = $(window).scrollTop();
+    if ((winHeight + scrollTop) >= ftrOffsetTop) {
+      div.is(".fixed") && div.removeClass("fixed");
+    } else {
+      div.is(":not(.fixed)") && div.addClass("fixed");
+    }
+  }*/
+  
+  function stickyDiv() {
+    var startPosition = $('.outfit_div').eq(0).offset().top+$('.outfit_div').eq(0).height();
+    var div = $('.fix_price_cart');
+    var winHeight = $(window).height();
+    var ftrOffsetTop = $('.outfit_div:last').offset().top+$('.outfit_div:last').height()+70;//$('#footer').offset().top;
+    var scrollTop = $(window).scrollTop();
+    if((winHeight + scrollTop) > startPosition){
+      div.is(":not(.fixed)") && div.addClass("fixed");
+      if ((winHeight + scrollTop) >= ftrOffsetTop) {
+        div.is(".fixed") && div.removeClass("fixed");
+      } else {
+        div.is(":not(.fixed)") && div.addClass("fixed");
+      }
+    }else{
+    	div.is(".fixed") && div.removeClass("fixed");
+    }
+  }
+
+
+  function tartan_div_insilder(pro_id,tindex,first_time){
+    var tartan_cookie = $.cookie("outfit_"+tindex);
+    /*var pro_cookie = $.cookie('{{product.id}}'); 
+                              console.log(pro_cookie);*/
+
+    if(tartan_cookie != "" && tartan_cookie != undefined && tartan_cookie != "null"){
+
+      load_tartan_div(Shopify.shop,tartan_cookie,pro_id,first_time,tindex); 
+    }else{
+      var html = "<table>"+
+          "<tbody>"+
+          "<tr>"+
+          "<td>"+
+          "<a href='javascript:void(0);' class='change_tartan_div change_tartan' onclick='open_tartan_popup(this,"+pro_id+","+tindex+")'>"+
+          "<span class='img_border'><img src='"+SITE_URL+"image/select_tartan.jpg' /></span>"+
+          "<img src='"+SITE_URL+"image/295.png' alt='Loading..' class='sa_tselect_loading'>"+
+          "</a></td>"+
+          "<td><span class='select_tartan'>SELECT YOUR TARTAN</span>"+
+          "<a href='javascript:void(0);' class='open_tartan change_tartan open_loading' onclick='open_tartan_popup(this," + pro_id + ","+tindex+")'>Open tartan database"+
+          "<img src='" + SITE_URL + "image/295.png' alt='Loading..' class='sa_tselect_loading sa_inline'></a></td>"+
+          "</tr></tbody></table>";
+      $(".tartan_inc[pro_id='" + pro_id + "'] .product_tartan").html(html);
+    }
+  }
+
+  function add_btn_active(){
+    var err_msg = "";
+    $(".slick-active .add-to-cart-form").each(function(){
+      var opt_flag = true;
+      if($(this).attr("required")){
+
+        if($(this).hasClass("contain_tartan")){
+          if($("#tartan_id_"+$(this).attr("pid")).val() == ""){
+            err_msg += "Please select tartan from "+$(this).attr("coll_name")+" to continue";
+            opt_flag = false;
+          }
+        }
+        $(this).find('.outfit_dropdown').each(function(){
+          if($(this).find("option:selected").val() == ""){
+            opt_flag = false;
+          }
+        });
+
+        if(opt_flag == true && !$(this).attr("variant_avail")){
+          if($(this).attr("variant_selected") == "false"){
+            opt_flag = false;
+          }
+        }
+
+        if(opt_flag == false){
+          if(err_msg != ""){
+            err_msg += "\n";
+          }
+          err_msg += $(this).attr("coll_name");
+        }
+      }
+
+    });
+
+    if(err_msg == ""){
+      $(".tartan_addto_cart").removeClass("oft_add_opacity");
+    }else{
+      $(".tartan_addto_cart").addClass("oft_add_opacity");
+    }
+  }
+
+  function count_final_price(){
+    var final_price = 0.00;
+
+    $(".slick-active .in_count_price:visible").each(function(){
+      var opt_flag = true;
+     /* $(this).parents(".outfit_desc").find('.outfit_dropdown').each(function(){
+        if($(this).find("option:selected").val() == ""){
+          opt_flag = false;
+        }
+      });*/
+      if(opt_flag == true){
+        if($(this).text() != "Unavailable"){
+          final_price = final_price + parseFloat($(this).text().replace(/[^\d.]/g, '').replace(".", ''));
+        }
+      }
+    });
+    $(".product-final-price").html(Shopify.formatMoney(final_price, "{{ shop.money_format }}"));
+                                                       add_btn_active();
+                                   $(".tartan-cart-feedback").remove();
+                                   }
+
+
+</script>
+{% include "tartan-swatch" %}
+<link rel="stylesheet" type="text/css" href="https://www.magnet.works/tartan/tartan.css">

@@ -1,0 +1,50 @@
+<section class="homepage-section">
+  {% if settings.full-width-slideshow %}{% else %}<div class="row"><div class="desktop-12">{% endif %}    
+  <div class="flexslider">
+    <ul class="slides">
+      {% for i in (1..5) %}
+      {% assign slide_show = 'slide-' | append: i | append: '-check' %}
+      {% if settings[slide_show] %}
+      {% assign index = 'slide' | append: i %}
+      {% assign slide_link_url = 'slide' | append: i | append: '_url' %}
+      {% assign slide_img_url = 'slide' | append: i | append: '.jpg' %}
+      {% assign slide_img_alt = 'slide' | append: i | append: '_alt' %}
+      {% assign slide_title = 'slide-' | append: i | append: '-title' %}
+      {% assign slide_caption = 'slide-' | append: i | append: '-caption' %}
+      {% assign slide_button = 'slide-' | append: i | append: '-button' %}
+      {% assign slide_button_text = 'slide-' | append: i | append: '-button-text' %}        
+      <li>
+        <a class="flexi-link" href="{{ settings[slide_link_url] }}">
+          <img id="slide-id" class="{% unless settings[slide_button] %}hover-active{% endunless %}" src="{{ slide_img_url | asset_url }}" alt="{{ settings[slide_img_alt] }}" />
+        </a>
+        {% if settings[slide_button] %}
+        <div class="flex-caption {{ index }} ">
+     {% else %}
+   <div class="flex-caption {{ index }} pointer-none">
+    {% endif %}
+            <div class="vertical-container">
+            <div class="vertical-cell">
+          {% if settings[slide_title] != blank %}<div class="caption-inners">{% endif %}
+            {% if settings[slide_title] != blank %}                        
+            <h2 class="slide-title">{{ settings[slide_title] }}</h2>
+            {% endif %}
+            {% if settings[slide_caption] != blank %}            
+            <p class="caption">{{ settings[slide_caption] }}</p>
+            {% endif %}
+            {% if settings[slide_button] %}
+            <div class="cta">
+              <a href="{{ settings[slide_link_url] }}">{{ settings[slide_button_text] }}</a>
+            </div>
+            {% endif %}  
+          {% if settings[slide_title] != blank %}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+      </li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% if settings.full-width-video %}{% else %}</div></div>{% endif %}    
+</section>
+<div class="clear"></div>

@@ -1,0 +1,36 @@
+{% assign tartan_avail_flag = false %}
+{% assign outfit_no = "" %}
+{% assign outfit_name = "" %}
+{% for i in (1..999) %}
+{% capture oft_no %}oft{{ i }}_list_products{% endcapture %}
+{% if settings[oft_no] == product.handle %}
+{% assign outfit_no = i %}
+{% break %}
+{% endif %}
+{% endfor %}
+
+{% if outfit_no != "" %}
+{% assign tartan_avail_flag = true %}
+
+{% assign outfit_name =  "Outfit " | append: outfit_no %}
+
+{% capture outfit_name_field %}oft{{outfit_no}}_outfit_name{% endcapture %}
+
+{% unless settings[outfit_name_field] == "" %}
+{% assign outfit_name = settings[outfit_name_field] %}
+{% endunless %}
+
+{% endif %}
+
+{% if tartan_avail_flag == true %}
+
+{% capture oft_video_url %}oft{{ outfit_no }}_outfit_video_field{% endcapture %}
+
+{% include "tartan-product" %}
+
+{% else %}
+
+{% include "normal-product" %}
+
+{% endif %}
+

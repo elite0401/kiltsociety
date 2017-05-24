@@ -1,0 +1,203 @@
+<div id="shopping-cart" class="desktop-12 tablet-6 mobile-3">
+
+  <h2>{{ 'cart.general.title' | t }}</h2>
+  {% if cart.item_count == 0 %}
+  <p>{{ 'cart.general.empty' | t }}</p> 
+  {% else %}
+  <script type="text/javascript">
+    function remove_item(id) {
+      document.getElementById('updates_'+id).value = 0;
+      $('.cart-qty[line_id="updates_'+id+'"]').val(0);
+      document.getElementById('cartform').submit();
+    }
+  </script>
+
+  <form action="/cart" method="post" id="cartform">
+
+    <table class="desktop-9 tablet-6 mobile-3 cart-table">
+      <thead>
+        <tr>
+          <th>{{ 'cart.general.product' | t }}</th>
+          <th>{{ 'cart.general.price' | t }}</th>
+          <th style="text-align: center;">{{ 'cart.general.qty' | t }}</th>
+          <th style="text-align: center;">{{ 'cart.general.remove' | t }}</th>
+          <th>{{ 'cart.general.total' | t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart.items %}
+        {% unless item.properties.outfit_id%}
+
+        <tr>
+          <td>
+            <div class="cart-item">
+              <div class="cart-image">
+                <a href="{{ item.url }}" title="{{ item.product.title | escape }}">
+                  <img src="{{ item | img_url: 'small' }}"  alt="{{ item.title | escape }}" />         
+                </a>
+              </div>
+              <div class="cart-title">
+                {% if settings.vendor %}<p>{{ item.vendor }}</p>{% endif %}
+                <a href="{{ item.url }}" title="{{ item.product.title | escape }}">
+                  <p>
+                    {% assign property_size = item.properties | size %}
+                    {% assign contain_tartan = false %}
+                    {% if property_size > 0 %}
+                    {% for p in item.properties %}
+                    {% if p.first == "Tartan Name" %}
+                    {% assign contain_tartan = true %}
+                    {% break %}
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    {% if contain_tartan == true %}
+                    {{ item.product.title }}
+                    {% else %}
+                    {{ item.title }}
+                    {% endif %}
+                  </p>
+                </a>
+                {% assign property_size = item.properties | size %}
+                {% if property_size > 0 %}
+                {% for p in item.properties %}
+                {% unless p.last == blank or p.first == "Outfit" %}
+                {{ p.first }}:
+
+                {% if p.last contains '/uploads/' %}
+                <a href="{{ p.last }}">{{ p.last | split: '/' | last }}</a>
+                {% else %}
+                {{ p.last }}
+                {% endif %}
+
+                <br>
+                {% endunless %}
+                {% endfor %}
+                {% endif %}
+
+                {% assign main_item_id = item.variant.id %}
+                {% assign main_price = 0.00 %}
+                {% assign total_price = item.price | times: item.quantity %}
+                {% assign has_outfit = false %}
+
+                {% for sub_item in cart.items %}
+                {% if sub_item.properties.outfit_id  contains  main_item_id %}
+                <dl class="sub_items">
+                  <dt>
+                    {% if sub_item.properties.item_type%}
+                    {{ sub_item.properties.item_type }}: 
+                    {% endif %}
+                    <i>{{ sub_item.title }}</i>
+                    {% include 'product-customizer-helper' %}
+                    <input type="hidden" class="cart-qty" name="updates[{{ sub_item.id }}]" line_id="updates_{{ main_item_id }}" value="{{ sub_item.quantity }}"/>    
+                  </dt>
+                  <dd>{{ sub_item.price | money }}</dd> 
+                  {% assign property_size = sub_item.properties | size %}
+                  {% if property_size > 0 %}
+                  {% for p in sub_item.properties %}
+                  {% unless p.first == "outfit_id" or p.first == "item_type" %}
+                  {% unless p.last == blank %}
+                  <dd>{{ p.first }}: {{ p.last }}</dd> 
+                  {% endunless %}
+                  {% endunless %}
+                  {% endfor %}
+                  {% endif %}
+                </dl>
+
+                {% assign has_outfit = true %}
+                {% assign sitem_price = sub_item.price | times: sub_item.quantity %}
+                {% assign main_price = main_price | plus: sub_item.price %}
+                {% assign total_price = total_price | plus: sitem_price %}
+                {% endif %}
+                {% endfor %} 
+
+                {% unless has_outfit == true %}
+                {% assign main_price = item.price %}
+                {% endunless %}
+              </div>
+            </div>
+          </td>
+          <td>
+            <p>
+              {% if has_outfit == true %}
+              {{ main_price | money }}
+              {% else %}
+                {% if item.type == 'Kilt Outfit Packages' %}
+                	{% if item.compare_at_price_varies %} {{ 'products.general.from' | t }} {{ item.compare_at_price_min | money }} - {{ item.compare_at_price_max | money }} {% else %}{{ item.compare_at_price | money }}{% endif %}
+                {% else %}
+					{% if item.price < item.compare_at_price %}
+              			{{ item.price | money }} <br />
+              			<del>{{ item.compare_at_price | money }}</del>
+              		{% else %}
+              			{% if item.price_varies %} {{ 'products.general.from' | t }} {{ item.price_min | money }} - {{ item.price_max | money }} {% else %}{{ item.price | money }}{% endif %}
+					{% endif %}
+                {% endif %}
+              {% endif %}
+            </p>          
+          </td>
+          <td>
+            <input type="text" class="cart-qty" size="4" name="updates[{{ item.id }}]" line_id="updates_{{ item.variant.id }}" id="updates_{{ item.variant.id }}" value="{{ item.quantity }}" onfocus="this.select();" style="max-width: 50px; text-align: center; margin: 0 auto 10px; "/>    
+          </td>
+          <td style="text-align: center">
+            <p><a href="#" onclick="remove_item({{ item.variant.id }}); return false;"><i class="fa fa-trash-o fa-2x"></i></a></p>
+          </td>
+          <td>
+            <p>{{ total_price | money }}</p>
+          </td>
+        </tr>
+
+        {% endunless %}
+        {% endfor %}
+      </tbody>
+    </table>
+
+
+    <div id="basket-right" class="desktop-3 tablet-6 mobile-3">
+      <h4>{{ 'cart.general.subtotal' | t }} {{ cart.total_price | money }}</h4>
+      <p><a href="/collections">{{ 'cart.general.continue' | t }}</a></p>
+      <input type="submit" name="update" id="update-cart" value="{{ 'cart.general.update' | t }}" class="button" />
+      <input type="submit" name="checkout" id="checkout" value="{{ 'cart.general.checkout' | t }}" class="button" />
+      <p>
+        {{ shop.name }} process all orders in {{ shop.currency }}.
+      </p>      
+      <div class="clear"></div>
+      {% if additional_checkout_buttons %} {{ content_for_additional_checkout_buttons }} {% endif %}
+      <div class="clear"></div>
+      {% for type in shop.enabled_payment_types %}
+      <img src="{{ type | payment_type_img_url }}" />
+      {% endfor %}       
+    </div>
+
+
+    <div id="cart-notes" class="desktop-12 mobile-3">
+      <label for="note"><strong>{{ 'cart.general.note' | t }}</strong></label>
+      <textarea name="note" id="note" rows="5" cols="60">{{cart.note}}</textarea>  
+    </div>     
+
+
+  </form>
+  {% endif %}
+
+  <div class="clear"></div>
+
+  {% if settings.show_recent_products %}
+  <div id="looked-at" class="desktop-12 mobile-half">
+    {% include 'recently-viewed' %}
+  </div>
+  {% endif %}
+
+</div>
+<script>
+  $(document).ready(function(){
+    $(document).on("change",".cart-qty",function(){
+      var line_id = $(this).attr("line_id");
+      $('.cart-qty[line_id="'+line_id+'"]').val($(this).val());
+    });	
+  });
+</script>
+<style>
+  .cart-item .cart-image{width:15%;vertical-align:top;}
+  .cart-item .cart-title{width:75%;}
+  .sub_items{margin-bottom:10px;}
+  .sub_items dt{font-weight:normal;}
+  .sub_items dd{padding-left:15px;}
+</style>

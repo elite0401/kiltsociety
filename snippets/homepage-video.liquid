@@ -1,0 +1,8 @@
+<section class="homepage-section">
+  {% if settings.full-width-video %}{% else %}<div class="row"><div class="desktop-12">{% endif %}  
+  <div class="videoWrapper">
+    {{ settings.video-embed }}
+  </div>
+  {% if settings.full-width-video %}{% else %}</div></div>{% endif %}    
+</section>
+<div class="clear"></div>

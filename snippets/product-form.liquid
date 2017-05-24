@@ -1,0 +1,215 @@
+<form action="/cart/add" method="post" data-money-format="{{ shop.money_format }}" id="product-form-{{ product.id }}">
+{% include 'product-customizer-regular' %}
+  {% if product.tags contains "tartan-library" and product.options contains "Price Id"%}
+  {% assign hide_default_title = false %}
+  {% if product.variants.size == 1 and product.variants.first.title contains 'Default' %}
+  {% assign hide_default_title = true %}
+  {% endif %}
+
+  <div class="select clearfix"{% if hide_default_title %} style="display:none"{% endif %}>
+    <select id="product-select-{{product.id}}" name="id">
+      {% for variant in product.variants %}
+      {% if variant.available %}
+      <option value="{{ variant.id }}"{% if variant == product.selected_or_first_available_variant %} selected="selected" {% endif %}>{{ variant.title }} - {{ variant.price | money }}</option>
+      {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+  {% else%}
+
+  {% if product.options.size > 1 %}
+  <div class="select">
+    <select id="product-select-{{ product.id }}" name='id'>
+      {% for variant in product.variants %}
+      <option {% if variant == product.selected_or_first_available_variant %} selected="selected" {% endif %} data-sku="{{ variant.sku }}" value="{{ variant.id }}">{{ variant.title }} - {{ variant.price | money }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <!--{ for option in product.options %}
+{ include 'swatch' with option %}
+{ endfor %}-->
+  {% elsif product.options.size == 1 and product.variants.size > 1 %}
+  <div class="select">
+    <label>{{ product.options[0] }}</label>
+    <select id="product-select-{{ product.id }}" name='id'>
+      {% for variant in product.variants %}
+      <option {% if variant == product.selected_or_first_available_variant %} selected="selected" {% endif %} data-sku="{{ variant.sku }}" value="{{ variant.id }}">{{ variant.title }} - {{ variant.price | money }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <!--{ for option in product.options %}
+{ include 'swatch' with option %}
+{ endfor %}-->
+  {% else %}
+  <div class="what-is-it">
+    {% if product.options.first != 'Title' %}
+    <label>{{ product.options.first }}:</label>{% for variant in product.variants %}<span class="it-is">{{ variant.option1 | escape }}</span>{% endfor %}
+    {% endif %}
+  </div>
+  <div class="product-variants"></div><!-- product variants -->  
+  <input  type="hidden" id="{{ variant.id }}" name="id" data-sku="{{ variant.sku }}" value="{{ product.variants[0].id }}" />    
+  {% endif %}
+  
+   <!--Start of Infinite Options-->
+  
+<!--<div id="infiniteoptions-container"></div>-->
+  
+  <!--End of Infinite Options-->
+
+  {% endif %}
+  <div id="variant-inventory">
+    {% if product.variants.first.inventory_management == "shopify" and product.variants.first.inventory_quantity > 0 %}
+    We currently have {{ product.variants.first.inventory_quantity }} in stock.
+    {% endif %}
+  </div>   
+
+  {% if product.available %}  
+  <div class="product-add clearfix">  
+    {% if settings.show-qty %}
+    <h5>{{ 'products.product.quantity' | t }}</h5> 
+
+    <a class="downer" field="quantity"><i class="fa fa-minus"></i></a>
+    <input min="1" type="text" name="quantity" class="quantity" value="1" />
+    <a class="up" field="quantity"><i class="fa fa-plus"></i></a>
+    {% endif %}
+    <input type="submit" name="button" class="add clearfix" value="{{ 'products.product.add_to_cart' | t }}" />
+
+  </div>
+
+
+  {% endif %}
+
+</form>    
+
+<script>
+
+  var defaultOptionAdded = false;
+
+  // Shopify Product form requirement
+  selectCallback = function(variant, selector)
+  {
+    if (variant) {
+
+      if (variant.inventory_management == "shopify" && variant.inventory_policy != "continue") {
+        console.log('test1');
+        if (variant.inventory_quantity > 0) {
+          console.log('test2');
+          jQuery('#variant-inventory').text('We have ' + variant.inventory_quantity + ' in stock');
+        } else {
+          console.log('test3');
+          jQuery('#variant-inventory').text("This product is sold out");
+        }
+      } else if  (variant.inventory_management == "shopify" && variant.inventory_policy == "continue") {
+      	if (variant.inventory_quantity > 0) {
+          console.log('test4');
+          jQuery('#variant-inventory').text('We have ' + variant.inventory_quantity + ' in stock');
+        } else {
+          console.log('test5');
+          jQuery('#variant-inventory').text("{{product.metafields.shipping.leadtime}}");
+        }
+      } else {
+        console.log('test6');
+        jQuery('#variant-inventory').text("{{product.metafields.shipping.leadtime}}");
+      }
+    } else {
+                                          console.log('test7');
+      jQuery('#variant-inventory').text("");
+    }
+
+    if (variant) { $("#sku").html(variant.sku); }
+    var $product = $('#product-' + selector.product.id);    
+
+
+    // BEGIN SWATCHES
+    //if (variant) {
+    //  for (i=0;i<variant.options.length;i++) {
+    //      jQuery('.swatch[data-option-index="' + i + '"] :radio[value="' + variant.options[i] +'"]').prop('checked', true);
+    //  }      
+    //}
+    // END SWATCHES
+
+
+    if (variant && variant.available == true) {
+      if(variant.compare_at_price > variant.price){
+        $('.was', $product).html(Shopify.formatMoney(variant.compare_at_price, $('form', $product).data('money-format')));        
+      } else {
+        $('.was', $product).text('');
+      } 
+      $('.product-price', $product).html(Shopify.formatMoney(variant.price, $('form', $product).data('money-format'))) 
+      $('.add', $product).removeClass('disabled').removeAttr('disabled').val('{{ 'products.product.add_to_cart' | t }}');
+    } else {
+      var message = variant ? "{{ 'products.product.sold_out' | t }}" : "{{ 'products.product.sold_out' | t }}";
+     $('.was', $product).text('');
+      $('.product-price', $product).text(message);
+      $('.add', $product).addClass('disabled').attr('disabled', 'disabled').val(message); 
+    }
+
+    if (variant && variant.featured_image) {
+      var original_image = $("#{{ product.id }}"), new_image = variant.featured_image;
+
+                             {% if template == 'product' %}
+                             var $slider = $('.mobile-gallery');
+      var original_image = $(".flex-active-slide img"), new_image = variant.featured_image;                             
+      {% endif %}
+      Shopify.Image.switchImage(new_image, original_image[0], function (new_image_src, original_image, element) {
+
+        $(element).parents('a').attr('href', new_image_src);
+        $(element).attr('src', new_image_src);   
+        $(element).attr('data-image', new_image_src);   
+        $(element).attr('data-zoom-image',new_image_src);
+
+        $('.thumbnail[data-image-id="' + variant.featured_image.id + '"]').trigger('click');
+
+        {% if template == 'product' %}
+        $slider.each(function() { $(this).flexslider($('[data-image-id="' + variant.featured_image.id + '"]').data('index')); });
+        {% endif %}
+
+      });
+
+    }
+
+    /* HC - 07 Jun '16 - Combo box fixes */
+    if (!defaultOptionAdded)
+    {
+      var labelSelector = $('div.select .selector-wrapper label');
+      labelSelector.each(function(index) {
+        var labelElement = labelSelector.eq(index);
+
+        var labelTargetSelector = "#" + labelElement.attr('for');
+        var labelValue = labelElement.html();
+        // console.log(labelTargetSelector + ": " + labelValue);
+
+        var defaultOption = ("Select " + labelValue).toUpperCase();
+        $(labelTargetSelector).prepend("<option value=''>" + defaultOption + "</option>").val('');
+      });
+      labelSelector.hide(); // hide all labels
+
+      defaultOptionAdded = true;
+    }
+
+  }; 
+</script>
+
+
+<script type="text/javascript">
+  $(function() {
+
+    if($("#product-select-{{ product.id }}").length){
+    $product = $('#product-' + {{ product.id }});
+                 new Shopify.OptionSelectors("product-select-{{ product.id }}", { product: {{ product | json }}, onVariantSelected:
+                 selectCallback{% if template contains 'product'%}, enableHistoryState: false{% endif %} });
+
+    /*jQuery('.swatch :radio').change(function() {
+       var optionIndex = jQuery(this).parents('.swatch').attr('data-option-index');
+       var optionValue = jQuery(this).val();
+       jQuery('#product-{{ product.id }} .single-option-selector').eq(optionIndex).find('option').filter(function() { return jQuery(this).text() == optionValue }).parent().val(optionValue).trigger('change');	   
+	  }); */
+  }
+  });    
+</script>
+
+
+
+
+
+

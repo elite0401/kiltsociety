@@ -1,0 +1,217 @@
+<div itemscope itemtype="http://schema.org/Product" id="product-{{ product.id }}" class="product-page">
+
+  <meta itemprop="url" content="{{ shop.url }}{{ product.url }}">
+  <meta itemprop="image" content="{{ product.featured_image.src | img_url: 'grande' }}">
+
+  <!--- For Mobile --->
+  <div id="mobile-product" class="mobile-3">
+    <div class="mobile-gallery">
+      <ul class="slides">    
+        {% for image in product.images %}
+        <li data-thumb="{{ image | product_img_url: 'small' }}" data-image-id="{{ image.id }}"><img data-image-id="{{ image.id }}" src="{{ image.src | product_img_url: 'grande' }}" alt="{{ image.alt | escape }}"></li>
+        {% endfor %}
+      </ul>
+    </div>  
+  </div>   
+
+  <!--- For Desktop --->
+
+
+  <div id="product-photos" class="desktop-6 mobile-3">
+    {% assign featured_image = product.selected_or_first_available_variant.featured_image | default: product.featured_image %}
+    <div class="bigimage desktop-12">
+      <img id="{{ product.id }}" src="{{ featured_image | img_url: '1024x1024' }}" data-image-id="{{ image.id }}" data-zoom-image="{{ featured_image | img_url: 'master' }}" alt='{{ image.alt }}' title="{{ product.title }}"/>
+    </div>
+    <div id="{{ product.id }}-gallery">	
+      {% for image in product.images %}
+      <a href="#" data-image="{{ image | product_img_url: '1024x1024' }}" data-image-id="{{ image.id }}" data-zoom-image="{{ image | product_img_url: 'master' }}">
+        <img class="thumbnail desktop-2" src="{{ image | product_img_url: 'compact' }}" data-image-id="{{ image.id }}" alt="{{ image.alt  | escape }}" />
+      </a>
+      {% endfor %} 
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+
+      //initiate the plugin and pass the id of the div containing gallery images
+      $("#{{ product.id }}").elevateZoom({
+        gallery:'{{ product.id }}-gallery',
+        cursor: 'pointer', 
+        galleryActiveClass: 'active', 
+        borderColour: '#eee', 
+        borderSize: '1' 
+        }); 
+
+      //pass the images to Fancybox
+      $("#{{ product.id }}").bind("click", function(e) {  
+        var ez =   $('#{{ product.id }}').data('elevateZoom');	
+        $.fancybox(ez.getGalleryList());
+      return false;
+    });	 
+
+    $('.mobile-gallery').flexslider({
+      animation: "fade",
+      controlNav: false,
+      slideshow: false,
+      directionNav: true,
+      controlNav: "thumbnails"
+    });      
+
+    }); 
+  </script>
+
+
+  <div id="product-description" class="desktop-6 mobile-3">
+
+    <h3 itemprop="brand">{{ product.vendor }}</h3>
+    
+    <h1 itemprop="name">{{ product.title }}</h1>  
+      
+    <span class="product-sku">
+      
+      <div id="sku">{{ product.variants.first.sku }}</div>
+      
+    </span>
+    
+    <div itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+      <p id="product-price">
+        {% if product.available %}
+        {% if product.compare_at_price > product.price %}
+        <span class="product-price" itemprop="price">{{ product.price | money }}</span>&nbsp;<span class="was">{{ product.compare_at_price | money }}</span>
+        {% else %}
+        <span class="product-price" itemprop="price">{{ product.price | money }}</span>
+        {% endif %}
+        {% else %}
+        <span class="product-price" itemprop="price">Sold Out</span>
+        {% endif %}
+      </p>
+
+      <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+      <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+      
+      <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+      
+      {% if product.tags contains "tartan-library" and product.options contains "Price Id"%}
+      {% include "tartan_inc" %}
+      {% else %}
+      {% include 'product-form' %}  
+      {% endif %}
+
+    </div>
+
+    <div class="desc">
+
+      <h4>{{ 'products.product.product_details' | t }}</h4>
+
+      <div class="rte">{{ product.description | split: '<!-- split -->' | first }}</div>
+
+      {% if settings.show_tabs %}
+      <ul class="accordion">
+        {% unless settings.tab1 == blank %}
+        <li id="two" class="size">
+
+          {% if settings.tab1_title ==  blank %}
+          <a href="#two"><h4>{{ 'products.product.size_guide' | t }}</h4></a>
+          {% else %}
+          <a href="#two"><h4>{{ settings.tab1_title }}</h4></a>
+          {% endif %}           
+
+
+          <ul class="sub-menu">					
+            <li><div class="rte">{{ pages[settings.tab1].content }}</div></li>
+          </ul>
+        </li>
+        {% endunless %}
+
+
+        {% unless settings.tab2 == blank %}
+        <li id="three" class="delivery">
+
+          {% if settings.tab2_title ==  blank %}
+          <a href="#three"><h4>{{ 'products.product.delivery' | t }}</h4></a>
+          {% else %}
+          <a href="#three"><h4>{{ settings.tab2_title }}</h4></a>
+          {% endif %} 
+
+          <ul class="sub-menu">
+            <li><div class="rte">{{ pages[settings.tab2].content }}</div></li>
+          </ul>
+        </li>
+        {% endunless %}
+
+
+        {% unless settings.tab3 == blank %}
+        <li id="four" class="returns">
+
+          {% if settings.tab3_title ==  blank %}
+          <a href="#four"><h4>{{ 'products.product.returns' | t }}</h4></a>
+          {% else %}
+          <a href="#four"><h4>{{ settings.tab3_title }}</h4></a>
+          {% endif %}           
+
+          <ul class="sub-menu">					
+            <li><div class="rte">{{ pages[settings.tab3].content }}</div></li>
+          </ul>
+        </li>
+        {% endunless %}	
+      </ul>
+
+      <script type="text/javascript">
+        $(document).ready(function() {
+          // Store variables			
+          var accordion_head = $('.accordion > li > a'),
+              accordion_body = $('.accordion li > .sub-menu');
+          // Click function
+          accordion_head.on('click', function(event) {
+            // Disable header links				
+            event.preventDefault();
+            // Show and hide the tabs on click
+            if ($(this).attr('class') != 'active'){
+              accordion_body.slideUp('normal');
+              $(this).next().stop(true,true).slideToggle('normal');
+              accordion_head.removeClass('active');
+              $(this).addClass('active');
+            } else {
+              accordion_body.slideUp('normal');
+              accordion_head.removeClass('active');
+            }
+          });
+        });
+      </script>
+
+      {% endif %}
+
+    </div>
+
+    <!--- Hide view more section 
+    <div id="productnav" class="desktop-12 mobile-3">
+      <h4>{{ 'products.product.view_more' | t }}</h4>
+      <ul class="view-more">
+        <li>{{ 'products.product.product_type' | t }} {{ product.type | link_to_type }}</li>
+        <li>{{ 'products.product.brand' | t }}: {{ product.vendor | link_to_vendor }}</li>
+        {% if collection %}
+        <li>{{ 'products.product.collection' | t }} {% capture url %}/collections/{{ collection.handle }}{% endcapture %}{{ collection.title | link_to: url }}</li>
+        {% endif %}
+      </ul>
+    </div>
+    --->
+    
+  </div>
+
+  <div class="clear"></div>
+  
+  {% if product.description contains '<!-- split -->' %}
+  <div id="split-description" class="desktop-12 tablet-6 mobile-3">
+    <h4 class="section-title">{{ 'products.product.product_more_details' | t }}</h4>
+  <div class="rte">{{ product.description | split: '<!-- split -->' | last }}</div>
+  </div>
+  {% endif %}
+  
+  <div id="shopify-product-reviews" data-id="{{product.id}}">{{ product.metafields.spr.reviews }}</div>
+
+  {% if settings.show_related_products %}
+  {% include 'related-products' %}
+  {% endif %}
+
+</div>

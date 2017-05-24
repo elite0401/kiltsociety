@@ -1,0 +1,198 @@
+<script>
+
+  $(document).ready(function(){
+    $(document).on("click",".tartan_addto_cart",function(){
+      var oft_no = $(this).attr("oft_no");
+      var oft_name = $(this).attr("oft_name");
+
+      var ids = [];
+      var count = 1;
+      var err_msg = "";
+
+      var main_pro_id = $(".add-to-cart-form[main_form='true'").find("select[name='id'] option:selected").val();
+      ids.push({"id":main_pro_id,"qty": 1,"properties":{"Outfit":oft_name}});
+
+      $(".slick-active .add-to-cart-form").each(function(){
+        var opt_flag = true;
+        var pro_id = $(this).attr("pid");
+        
+        if($(this).attr("required")){
+
+          if($(this).hasClass("contain_tartan")){
+            if($("#tartan_id_"+pro_id).val() == ""){
+              err_msg += "Please select tartan from "+$(this).attr("coll_name")+" to continue";
+              opt_flag = false;
+            }
+          }
+          $(this).find('.outfit_dropdown').each(function(){
+            if($(this).find("option:selected").val() == ""){
+              opt_flag = false;
+            }
+          });
+
+          if(opt_flag == true && !$(this).attr("variant_avail")){
+            if($(this).attr("variant_selected") == "false"){
+              opt_flag = false;
+            }
+          }
+
+          if(opt_flag == false){
+            if(err_msg != ""){
+              err_msg += "\n";
+            }
+            err_msg += "Please select valid product from "+$(this).attr("coll_name");
+          }else{
+            var properties = {};
+            properties["outfit_id"] = main_pro_id;
+            properties["item_type"] = $(this).attr("coll_name");
+
+           
+            
+            if($(this).hasClass("contain_tartan")){
+              properties["Tartan Name"] = $("#tartan_name_"+pro_id).val();
+              properties["Tartan Mill"] = $("#tartan_mill_"+pro_id).val();
+              properties["Tartan Weight"] = $("#tartan_weight_"+pro_id).val();
+            }
+
+            var var_id = $(this).find("select[name='id'] option:selected").val();
+            ids.push({"id":var_id,"qty": 1,"properties":properties});
+            count++;
+          }
+
+        }else{
+          $(this).find('.outfit_dropdown').each(function(){
+            if($(this).find("option:selected").val() == ""){
+              opt_flag = false;
+            }
+          });
+
+          if(opt_flag == true){
+            var properties = {};
+            properties["outfit_id"] = main_pro_id;
+            properties["item_type"] = $(this).attr("coll_name");
+
+            if($(this).hasClass("contain_tartan")){
+              properties["Tartan Name"] = $("#tartan_name_"+pro_id).val();
+              properties["Tartan Mill"] = $("#tartan_mill_"+pro_id).val();
+              properties["Tartan Weight"] = $("#tartan_weight_"+pro_id).val();
+            }
+            var var_id = $(this).find("select[name='id'] option:selected").val();
+            ids.push({"id":var_id.val(),"qty": 1,"properties":properties});
+            count++;
+          }
+        }
+
+      });
+
+
+      if(err_msg != ""){
+        alert(err_msg);
+        return false;
+      }
+
+      ids.reverse(); 
+      /*console.log(ids);
+      return false;*/
+
+      $(this).val("Adding...").attr('disabled', 'disabled');
+      MGUtil.begin(ids);
+    });
+
+  });
+
+  var MGUtil={
+    data:[],
+    ini:0,
+    total:0,
+    err:[],
+    err_count:0,
+    cartCountSelector: '.cart-count',
+    addItem:function(qty,id,properties,callback) {
+      var params = {quantity:qty,id:id};
+      if(properties != false){
+        params.properties = properties;
+      }
+      $.ajax({
+        type: 'POST',
+        url: '/cart/add.js',
+        dataType: 'json',
+        async:false,
+        data: params,
+        success: function(){
+          if(typeof callback === 'function'){
+            callback();
+          }
+        },
+        error: function(err_json){
+          MGUtil.err[MGUtil.err_count] = err_json['responseJSON']['description'];
+          MGUtil.err_count++;
+          if(typeof callback === 'function'){
+            callback();
+          }
+        }
+      });
+    },
+    recursive:function(){
+      MGUtil.addItem(MGUtil.data[MGUtil.ini].qty,MGUtil.data[MGUtil.ini].id,MGUtil.data[MGUtil.ini].properties,function(){
+        //console.log(MGUtil.data[MGUtil.ini]);
+        MGUtil.ini += 1;
+        if(MGUtil.ini < MGUtil.total){
+          MGUtil.recursive();
+        }else{
+
+          var feedback = "";
+          if(MGUtil.err.length > 0){
+            feedback = '<p class="tartan-cart-feedback error" style=""><i class="fa fa-warning"></i> '+MGUtil.err.join("<br>")+'</p>';
+          }else{
+            feedback = '<p class="tartan-cart-feedback success" style=""><i class="fa fa-check"></i> Added to Cart <a href="/cart">View Cart</a> or <a href="/collections/all">Continue Shopping</a>.</p>';
+          }
+
+          if(MGUtil.err.length != MGUtil.total){
+            $.getJSON("/cart.js", function(cart) {
+              if (MGUtil.cartCountSelector && $(MGUtil.cartCountSelector).size()) {
+                var value = $(MGUtil.cartCountSelector).html();
+                var cart_count = 0;
+                $.each(cart.items,function(i,data){
+                  if("outfit_id" in data['properties'] ) {
+                  }else{
+                    cart_count = cart_count + data['quantity'];
+                  }
+                });
+
+                $(MGUtil.cartCountSelector).html(value.replace(/[0-9]+/,cart_count));
+              }
+            });
+          }
+
+          $(".tartan_addto_cart").after(feedback);
+          $(".tartan_addto_cart").val("Add to cart").removeClass("disabled").removeAttr('disabled');
+          setTimeout(function(){
+            $(".tartan-cart-feedback").remove();
+          },3500);
+          MGUtil.ini = 0;
+          MGUtil.total = 0;
+          MGUtil.err = [];
+          MGUtil.err_count = 0;
+          return false;
+          //document.location.href = '/cart';//AFTER TO ADD ITEMS, GO TO THE CART 
+        }
+      });
+    },
+    begin:function(pro_arr){
+      /*SAMPLE*/
+      /* SET YOUR ARRAY QTY's' ID's PROPERTIES(FALSE IF IS EMPTY)*/
+      MGUtil.data = pro_arr/*[
+        {"id":"12345","qty":2,"properties":{"data1":"1"}},
+      ]*/;
+      MGUtil.total = MGUtil.data.length;
+      MGUtil.recursive();
+    }
+  };
+  //
+</script>
+
+<style>
+  .tartan-cart-feedback{margin-right:40px;margin-bottom:0px;}
+  .tartan-cart-feedback.success { color: #3D9970; }
+  .tartan-cart-feedback.error { color: #FF4136; } 
+</style>

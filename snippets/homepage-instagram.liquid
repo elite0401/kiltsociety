@@ -1,0 +1,20 @@
+<section class="homepage-section">
+  <article class="row">
+
+    {% assign url = '{{image}}' %}
+    {% assign caption = '{{caption}}' %}
+    <div id="instagram-card" class="clearfix">
+      <h2 class="section-title desktop-12"><a href="http://instagram.com/{{ settings.instagram_name }}" target="_blank">{{ 'layout.homepage.instagram' | t }} @{{ settings.instagram_name }}</a> {{ 'layout.homepage.instagram_follow_where' | t }}</h2>
+      <div id="instafeed"></div>
+      <script type="text/javascript">
+        var userFeed = new Instafeed({
+          get: 'user',
+          userId: {{ settings.instagram-user-id }},
+          accessToken: '{{ settings.instagram-access-token }}',
+          template: '<a class="fancybox desktop-2 mobile-1 padded" href="{{url}}" rel="ig" title="{{ caption }}"><img class="instagram-image" src="{{ url }}" /></a>'
+        });
+        userFeed.run();        
+      </script>
+    </div>
+  </article>
+</section>

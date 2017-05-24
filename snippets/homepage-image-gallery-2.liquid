@@ -1,0 +1,43 @@
+{% assign grid = 0 %}
+{% if settings.promo5 %}{% assign grid = grid | plus: 1 %}{% endif %}
+{% if settings.promo6 %}{% assign grid = grid | plus: 1 %}{% endif %}
+{% if settings.promo7 %}{% assign grid = grid | plus: 1 %}{% endif %} 
+{% if settings.promo8 %}{% assign grid = grid | plus: 1 %}{% endif %}   
+{% if grid > 0 %}      
+<section class="homepage-section homepage-gallery">
+  <article class="row">
+    {% if settings.homepage_gallery2_fw %}<div class="row">{% endif %}
+
+    {% assign promo = 'promo5' %}
+    {% if settings.promo5 %}        
+    <div class="homepage-promo desktop-{{ 12 | divided_by: grid }} {% if grid >= 2 %}omega{% endif %} mobile-3">
+      {% include 'homepage_promo' %}
+    </div>
+    {% endif %}
+
+    {% assign promo = 'promo6' %}
+    {% if settings.promo6 %}  
+    <div class="homepage-promo desktop-{{ 12 | divided_by: grid }} {% if grid >= 1 %}alpha{% endif %} {% if grid > 2 %}omega{% endif %} mobile-3">
+      {% include 'homepage_promo' %}
+    </div>
+    {% endif %}        
+
+    {% assign promo = 'promo7' %}
+    {% if settings.promo7 %}  
+    <div class="homepage-promo desktop-{{ 12 | divided_by: grid }} {% if grid >= 2 %}alpha{% endif %} {% if grid > 3 %}omega{% endif %} mobile-3">
+      {% include 'homepage_promo' %}
+    </div>
+    {% endif %}
+
+    {% assign promo = 'promo8' %}
+    {% if settings.promo8 %}  
+    <div class="homepage-promo desktop-{{ 12 | divided_by: grid }} {% if grid >= 3 %}alpha{% endif %} mobile-3">
+      {% include 'homepage_promo' %}
+    </div>
+    {% endif %}        
+
+    {% if settings.homepage_gallery2_fw %}</div>{% endif %}    
+  </article>
+</section>
+{% endif %}
+<div class="clear"></div>
